@@ -28,11 +28,13 @@ def initialize_parameters(n_x, n_y, number_of_hidden_layers, dimension_of_layer)
     np.random.seed(2)
 
     parameters = {}
+    # this if is here if you just want to try a simple logistic regression
     if number_of_hidden_layers == 0:
         parameters["W1"] = np.random.randn(n_y, n_x) * 0.01
         parameters["b1"] = np.zeros((n_y, 1))
 
     else:
+        # initializing weight matices with random numbers and biases vectors with 0
         parameters["W1"] = np.random.randn(dimension_of_layer, n_x) * 0.01
         parameters["b1"] = np.zeros((dimension_of_layer, 1))
         for i in range(2, number_of_hidden_layers + 1):
@@ -48,6 +50,7 @@ def initialize_parameters(n_x, n_y, number_of_hidden_layers, dimension_of_layer)
     return parameters
 
 
+# function for advancing forward with the linear step between 2 levels
 def linear_forward(A, W, b):
     Z = np.dot(W, A) + b
 
@@ -55,6 +58,7 @@ def linear_forward(A, W, b):
     return Z, cache
 
 
+# function for advacing forward depending on the activation function
 def linear_activation_forward(A_prev, W, b, activation):
 
     if activation == "sigmoid":
@@ -74,11 +78,13 @@ def linear_activation_forward(A_prev, W, b, activation):
     return A, cache
 
 
+# function for forward step
 def L_model_forward(X, parameters):
     caches = []
     A = X
     L = len(parameters) // 2
 
+    # the hidden layers are activated using the ReLU activation function
     for l in range(1, L):
         A_prev = A
         A, cache = linear_activation_forward(
@@ -89,6 +95,7 @@ def L_model_forward(X, parameters):
         )
         caches.append(cp.deepcopy(cache))
 
+    # in the last layer I use sigmoid activation function
     AL, cache = linear_activation_forward(
         A, parameters["W" + str(L)], parameters["b" + str(L)], activation="sigmoid"
     )
@@ -97,6 +104,7 @@ def L_model_forward(X, parameters):
     return AL, caches
 
 
+# function for computing the cost after a forward step
 def compute_cost(AL, Y):
 
     m = Y.shape[1]
@@ -108,6 +116,7 @@ def compute_cost(AL, Y):
     return cost
 
 
+# function for computing dW, db, dA in the backward step
 def linear_backward(dZ, cache):
     A_prev, W, b = cache
     m = A_prev.shape[1]
@@ -118,6 +127,7 @@ def linear_backward(dZ, cache):
     return dA_prev, dW, db
 
 
+# function for computing dZ when the activation function is ReLU
 def relu_backward(dA, activation_cache):
     Z = cp.deepcopy(activation_cache)
     Z[Z < 0] = 0
@@ -126,12 +136,14 @@ def relu_backward(dA, activation_cache):
     return dZ
 
 
+# function for computing dZ when the activation function is sigmoid
 def sigmoid_backward(dA, activation_cache):
     dZ = np.multiply(activation_cache, dA)
     dZ = np.multiply(dZ, (1.0 - activation_cache))
     return dZ
 
 
+# function for computing dZ when the activation function is tanh
 def tanh_backward(dA, activation_cache):
     Z = cp.deepcopy(activation_cache)
     Z = 1.0 - np.power(Z, 2)
@@ -139,6 +151,7 @@ def tanh_backward(dA, activation_cache):
     return dZ
 
 
+# functions for computing dW, db, dA for each backward step
 def linear_activation_backward(dA, cache, activation):
 
     linear_cache, activation_cache = cache
@@ -155,6 +168,7 @@ def linear_activation_backward(dA, cache, activation):
     return dA_prev, dW, db
 
 
+# functions for computing the backward steps
 def L_model_backward(AL, Y, caches):
 
     grads = {}
@@ -182,6 +196,7 @@ def L_model_backward(AL, Y, caches):
     return grads
 
 
+# function for updating al weight matrices and bias vectors
 def update_parameters(params, grads, learning_rate):
     parameters = cp.deepcopy(params)
     L = len(parameters) // 2
@@ -197,6 +212,7 @@ def update_parameters(params, grads, learning_rate):
     return parameters
 
 
+# function for creating a NN with n number of hidden layers
 def L_layer_model(
     X,
     Y,
@@ -229,6 +245,7 @@ def L_layer_model(
     return parameters, costs
 
 
+# function for predicting the final results after training
 def predict(X, Y, parameters):
 
     m = X.shape[1]

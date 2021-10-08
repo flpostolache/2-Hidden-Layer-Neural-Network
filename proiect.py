@@ -37,6 +37,7 @@ parameters, costs = fc.L_layer_model(X_train, Y_train, 2, 20, 0.09, 4301, True)
 Y_train_pred = fc.predict(X_train, Y_train, parameters)
 Y_test_pred = fc.predict(X_test, Y_test, parameters)
 
+# saving the parameters
 with open("Valori_w_si_b.txt", "wb") as f:
     for i in parameters:
         np.save(f, parameters[i])
